@@ -9,13 +9,13 @@ function App(props) {
   const [displayTable, setDisplayTable] = useState(false)
 
   return (
-    <div>
+    <div className = 'container'>
       <DropdownButton id="dropdown-basic-button" title = {`Choose the base exchange (${baseEx} is current)`} className = 'dropdown__list' onClick = {() => setDisplayTable(false)}>
         <Dropdown.Item onClick = {() => setBaseEx('EUR')}>EUR</Dropdown.Item>
         <Dropdown.Item onClick = {() => setBaseEx('USD')}>USD</Dropdown.Item>
         <Dropdown.Item onClick = {() => setBaseEx('RUB')}>RUB</Dropdown.Item>
       </DropdownButton>
-      <Button onClick = {() => setDisplayTable(true)}>Получить котировки</Button>
+      <Button onClick = {() => setDisplayTable(true)} className = 'getrates__button'>Get rates</Button>
       {displayTable ? <Tabledata baseEx = {baseEx}/> : null}
     </div>
   );

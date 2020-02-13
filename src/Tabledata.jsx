@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import { Table, Spinner, Button } from 'react-bootstrap'
 import Tableelement from './Tableelement'
@@ -14,15 +14,14 @@ const Tabledata = ({baseEx}) => {
    const [cmpWithLatest, setCmpWithLatest] = useState(true)
    const [timeOfRequest, setTimeOfRequest] = useState(null)
 
-   const getPrevStringyData = (date) => {
-      if (date) {
-         let prevDate = new Date(date)
-         prevDate.setDate(prevDate.getDate()-1)
-         return `${prevDate.getFullYear()}-${prevDate.getMonth() + 1}-${prevDate.getDate()}`
-      }
-   }
-
    useEffect(() => {
+      const getPrevStringyData = (date) => {
+         if (date) {
+            let prevDate = new Date(date)
+            prevDate.setDate(prevDate.getDate()-1)
+            return `${prevDate.getFullYear()}-${prevDate.getMonth() + 1}-${prevDate.getDate()}`
+         }
+      }
       setCurrentBaseEx(baseEx)
       const getData = async (setMethod, date = 'latest') => {
          try {
@@ -52,12 +51,20 @@ const Tabledata = ({baseEx}) => {
       else return value
    }
 
-   const setFiveMax = () => {
+   const myRef = useRef(null)
+
+   const scrollToRef = (ref) => {
+      if (currentRel && ref) {
+         window.scrollTo(0, ref.current.offsetTop)
+      } 
+   }
+
+   const setFiveMax =  () => { 
       if (cmpWithLatest) {
-         setCurrentRel(Object.keys(baseData.rates).slice(0).sort((a,b) => compareHelperFunction(baseData.rates[a],oneDayAgoData.rates[a]) < compareHelperFunction(baseData.rates[b],oneDayAgoData.rates[b]) ? 1 : -1).slice(0,5))
+          setCurrentRel(Object.keys(baseData.rates).slice(0).sort((a,b) => compareHelperFunction(baseData.rates[a],oneDayAgoData.rates[a]) < compareHelperFunction(baseData.rates[b],oneDayAgoData.rates[b]) ? 1 : -1).slice(0,5))
       }
       else {
-         setCurrentRel(Object.keys(baseData.rates).sort((a,b) => compareHelperFunction(oneDayAgoData.rates[a],twoDaysAgoData.rates[a]) < compareHelperFunction(oneDayAgoData.rates[b],twoDaysAgoData.rates[b]) ? 1 : -1).slice(0,5))
+          setCurrentRel(Object.keys(baseData.rates).sort((a,b) => compareHelperFunction(oneDayAgoData.rates[a],twoDaysAgoData.rates[a]) < compareHelperFunction(oneDayAgoData.rates[b],twoDaysAgoData.rates[b]) ? 1 : -1).slice(0,5))
       }
    }
 
@@ -68,27 +75,31 @@ const Tabledata = ({baseEx}) => {
 
    return ( 
       isLoading || !baseData.date || !oneDayAgoData.date || !twoDaysAgoData.date ? <Spinner animation = 'border'/>
-      :<div>
-         {<Button onClick = {() => (setCmpWithLatest(!cmpWithLatest), setCurrentRel(null))}>{cmpWithLatest ? <p>Показать вчера/позавчера</p> : <p>Показать сегодня/вчера</p>}</Button>}
-         <p>Базовая валюта: {baseEx}</p>
-         <div>Дата запроса: {baseData.date.toDateString()} </div>
-         <p>Время запроса: {timeOfRequest ? `${showRightFormatTime(timeOfRequest.getHours())}:${showRightFormatTime(timeOfRequest.getMinutes())}` : null}</p>
-         <Button onClick = {() => setFiveMax()}>Показать 5 максимально изменившихся (под основной таблицей)</Button>
-         <Table striped bordered>
-            <thead>
-               <tr>
-                  <th>Валюта</th>
-                  <th>Базовое значение(на {cmpWithLatest ? baseData.date.toDateString() : oneDayAgoData.date.toDateString()})</th>
-                  <th>Изменение по сравнению с {cmpWithLatest ? oneDayAgoData.date.toDateString() : twoDaysAgoData.date.toDateString()}</th>
-               </tr>
-            </thead>
-            <tbody>
-               {Object.keys(baseData.rates)
-                  .map(el => <Tableelement exchange = {el} setCurrentRel = {setCurrentRel} baseValues = {cmpWithLatest ? baseData.rates[el] : oneDayAgoData.rates[el]} oneDayAgo = {cmpWithLatest ? oneDayAgoData.rates[el] : twoDaysAgoData.rates[el]} />)
-               }  
-            </tbody>
-         </Table>
-         {currentRel ? <TableOfMaxs maxRel = {currentRel} baseValues = {cmpWithLatest ? baseData.rates : oneDayAgoData.rates} oneDayAgo = {cmpWithLatest ? oneDayAgoData.rates : twoDaysAgoData.rates}/> : null}
+      :<div class = 'container'>
+         {<Button onClick = {() => (setCmpWithLatest(!cmpWithLatest), setCurrentRel(null))}>{cmpWithLatest ? <p> Show for yesterday / one day before</p> : <p>Show for today/yesterday</p>}</Button>}
+         <p>Base exchange: <b>{baseEx}</b></p>
+         <div>Request date: <b>{baseData.date.toDateString()}</b></div>
+         <p>Request time: <b>{timeOfRequest ? `${showRightFormatTime(timeOfRequest.getHours())}:${showRightFormatTime(timeOfRequest.getMinutes())}` : null}</b></p>
+         <Button onClick = {() => {setFiveMax(); scrollToRef(myRef)}} className = 'getmax__button'>Show 5 maximally changed (under the main table) via doubleClick</Button>
+         <div>
+            <Table striped bordered >
+               <thead >
+                  <tr>
+                     <th className = {'maintable-col__nameex'}>Exchange</th>
+                     <th className = {'maintable-col__baseex'}>Base course(on {cmpWithLatest ? baseData.date.toDateString() : oneDayAgoData.date.toDateString()})</th>
+                     <th className = {'maintable-col__compareex'}>Improvements to {cmpWithLatest ? oneDayAgoData.date.toDateString() : twoDaysAgoData.date.toDateString()}</th>
+                  </tr>
+               </thead>
+               <tbody>
+                  {Object.keys(baseData.rates)
+                     .map(el => <Tableelement exchange = {el} setCurrentRel = {setCurrentRel} baseValues = {cmpWithLatest ? baseData.rates[el] : oneDayAgoData.rates[el]} oneDayAgo = {cmpWithLatest ? oneDayAgoData.rates[el] : twoDaysAgoData.rates[el]} />)
+                  }  
+               </tbody>
+            </Table>
+         </div>
+         <div ref = {myRef}>
+            {currentRel ? <TableOfMaxs  maxRel = {currentRel} baseValues = {cmpWithLatest ? baseData.rates : oneDayAgoData.rates} oneDayAgo = {cmpWithLatest ? oneDayAgoData.rates : twoDaysAgoData.rates}/> : null}
+         </div>
       </div>
    )
 }

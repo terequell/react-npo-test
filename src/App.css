@@ -1,3 +1,7 @@
+html {
+  scroll-behavior: smooth;
+}
+
 .App {
   text-align: center;
 }
@@ -29,8 +33,31 @@
 }
 
 .dropdown__list {
-  margin-bottom: 20px;
+  margin: 2vh 2vh 2vh 2vh;
 }
+
+.getrates__button {
+  margin: 0vh 2vh 2vh 2vh;
+}
+
+.main__table {
+  width: 300px;
+}
+
+.maintable-col__nameex {
+  width: 11%;
+}
+
+.maintable-col__baseex {
+  width: 14%;
+}
+
+.maintable-col__compareex {
+  width: 30%
+}
+.getmax__button {
+  margin-bottom: 2vh;
+} 
 
 @keyframes App-logo-spin {
   from {

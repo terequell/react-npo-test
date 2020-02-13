@@ -5,12 +5,12 @@ import {getRelationToPrev} from './Tableelement'
 const TableOfMaxs = ({maxRel, baseValues, oneDayAgo}) => {
    return (
       <div>
-         <p>Максимальные 5:</p>
+         <p>5 which max changed:</p>
          <Table striped bordered variant="dark">
             <thead>
                <tr>
-                  <th>Валюта</th>
-                  <th>Изменение относительно базового</th>
+                  <th>Exchange</th>
+                  <th>Percent of change improvements to base</th>
                </tr>
             </thead>
             <tbody>
