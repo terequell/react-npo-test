@@ -10,7 +10,7 @@ function App(props) {
 
   return (
     <div>
-      <DropdownButton id="dropdown-basic-button" title="Выберите базовую валюту (EUR по дефолту)" onClick = {() => setDisplayTable(false)}>
+      <DropdownButton id="dropdown-basic-button" title = {`Choose the base exchange (${baseEx} is current)`} className = 'dropdown__list' onClick = {() => setDisplayTable(false)}>
         <Dropdown.Item onClick = {() => setBaseEx('EUR')}>EUR</Dropdown.Item>
         <Dropdown.Item onClick = {() => setBaseEx('USD')}>USD</Dropdown.Item>
         <Dropdown.Item onClick = {() => setBaseEx('RUB')}>RUB</Dropdown.Item>

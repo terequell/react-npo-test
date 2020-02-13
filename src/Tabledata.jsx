@@ -40,7 +40,8 @@ const Tabledata = ({baseEx}) => {
          getData(setBaseData)
             .then(response => getData(setOneDayAgoData, getPrevStringyData(response))
                .then(response => getData(setTwoDaysAgoData, getPrevStringyData(response))))
-                  .then (setIsLoading(false), setTimeOfRequest(new Date()))
+         setIsLoading(false)
+         setTimeOfRequest(new Date())
       }
    }, [currentBaseEx, baseData])
 
@@ -61,24 +62,24 @@ const Tabledata = ({baseEx}) => {
    }
 
    const compareHelperFunction = (value1, value2) => {
-      const res = value1/value2*100;
+      const res = value1/value2*100
       return Math.abs(res-100)
    }
 
    return ( 
-      isLoading && setOneDayAgoData.date ? <Spinner animation = 'border'/>
+      isLoading || !baseData.date || !oneDayAgoData.date || !twoDaysAgoData.date ? <Spinner animation = 'border'/>
       :<div>
          {<Button onClick = {() => (setCmpWithLatest(!cmpWithLatest), setCurrentRel(null))}>{cmpWithLatest ? <p>Показать вчера/позавчера</p> : <p>Показать сегодня/вчера</p>}</Button>}
          <p>Базовая валюта: {baseEx}</p>
-         <div>Дата запроса: {baseData.date ? baseData.date.toDateString(): <Spinner animation = 'border'/>} </div>
+         <div>Дата запроса: {baseData.date.toDateString()} </div>
          <p>Время запроса: {timeOfRequest ? `${showRightFormatTime(timeOfRequest.getHours())}:${showRightFormatTime(timeOfRequest.getMinutes())}` : null}</p>
          <Button onClick = {() => setFiveMax()}>Показать 5 максимально изменившихся (под основной таблицей)</Button>
-         <Table striped bordered >
+         <Table striped bordered>
             <thead>
                <tr>
                   <th>Валюта</th>
-                  <th>Базовое значение(на {baseData.date ? (cmpWithLatest ? baseData.date.toDateString() : oneDayAgoData.date.toDateString()): null})</th>
-                  <th>Изменение по сравнению с {oneDayAgoData.date ? (cmpWithLatest ? oneDayAgoData.date.toDateString() : twoDaysAgoData.date.toDateString()) : null}</th>
+                  <th>Базовое значение(на {cmpWithLatest ? baseData.date.toDateString() : oneDayAgoData.date.toDateString()})</th>
+                  <th>Изменение по сравнению с {cmpWithLatest ? oneDayAgoData.date.toDateString() : twoDaysAgoData.date.toDateString()}</th>
                </tr>
             </thead>
             <tbody>
