@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react'
-import axios from 'axios'
 import { Table, Spinner, Button } from 'react-bootstrap'
 import Tableelement from './Tableelement'
 import TableOfMaxs from './TableOfMaxs'
@@ -17,7 +16,7 @@ const Tabledata = ({baseEx}) => {
    useEffect(() => {
       const getPrevStringyData = (date) => {
          if (date) {
-            let prevDate = new Date(date)
+            const prevDate = new Date(date)
             prevDate.setDate(prevDate.getDate()-1)
             return `${prevDate.getFullYear()}-${prevDate.getMonth() + 1}-${prevDate.getDate()}`
          }
@@ -25,9 +24,10 @@ const Tabledata = ({baseEx}) => {
       setCurrentBaseEx(baseEx)
       const getData = async (setMethod, date = 'latest') => {
          try {
-            const response = await axios.get(`https://api.exchangeratesapi.io/${date}?base=${baseEx}`)
-            setMethod({...response.data, date: new Date(response.data.date)})
-            return response.data.date
+            const response = await fetch(`https://api.exchangeratesapi.io/${date}?base=${baseEx}`)
+            const toJson = await response.json()
+            setMethod({...toJson, date: new Date(toJson.date)})
+            return toJson.date
          }
          catch (error) {
             console.log(error)
@@ -42,7 +42,7 @@ const Tabledata = ({baseEx}) => {
          setIsLoading(false)
          setTimeOfRequest(new Date())
       }
-   }, [currentBaseEx, baseData])
+   }, [baseEx])
 
    const showRightFormatTime = (value) => {
       if (value < 10) {
